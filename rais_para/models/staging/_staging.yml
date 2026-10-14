@@ -1,0 +1,11 @@
+version: 2
+
+# Sem testes aqui de propósito: testar a view de vínculos relê dados grandes
+# do BigQuery. Os testes ficam nas tabelas pequenas (marts).
+models:
+  - name: stg_rais_vinculos
+    description: "Vínculos da RAIS no Pará, 2015 em diante, colunas renomeadas."
+  - name: stg_municipio
+    description: "Municípios do Pará."
+  - name: stg_cnae
+    description: "Classes CNAE 2.0 com divisão e seção."

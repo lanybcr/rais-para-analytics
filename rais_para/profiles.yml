@@ -1,0 +1,12 @@
+﻿rais_para:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth            # usa o login do gcloud; nenhuma senha/chave no repositório
+      project: rais-para-analytics
+      dataset: rais             # prefixo; dbt cria rais_staging, rais_intermediate, rais_marts
+      location: US              # mesma região dos dados da Base dos Dados
+      threads: 4
+      priority: interactive
+      maximum_bytes_billed: 10000000000   # trava: recusa consulta que leia mais de 10 GB

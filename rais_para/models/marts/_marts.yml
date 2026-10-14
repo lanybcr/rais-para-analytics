@@ -1,0 +1,96 @@
+version: 2
+
+models:
+  - name: dim_municipio
+    description: "Um registro por município do Pará (144)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome do município."
+        tests: [not_null]
+
+  - name: dim_cnae
+    description: "Atividades econômicas (CNAE 2.0, nível classe), mais a linha 'Não classificado' (99999)."
+    columns:
+      - name: id_cnae_classe
+        description: "Código da classe CNAE (5 dígitos)."
+        tests: [not_null, unique]
+      - name: descricao_classe
+        description: "Nome da classe de atividade."
+      - name: descricao_secao
+        description: "Grande setor (ex.: Agricultura, Comércio, Indústria)."
+
+  - name: dim_escolaridade
+    description: "Grau de instrução (códigos 1 a 11 da RAIS, mais 99 = Não informado)."
+    columns:
+      - name: cod_escolaridade
+        description: "Código da escolaridade."
+        tests:
+          - not_null
+          - unique
+          - accepted_values:
+              arguments:
+                values: ['1','2','3','4','5','6','7','8','9','10','11','99']
+      - name: ordem
+        description: "Ordem para ordenar do menor ao maior grau no Power BI."
+
+  - name: dim_tempo
+    description: "Anos da década analisada (2015 a 2025)."
+    columns:
+      - name: ano
+        description: "Ano de referência."
+        tests: [not_null, unique]
+
+  - name: fct_vinculos
+    description: >
+      Fato: 1 linha = ano x município x classe CNAE x escolaridade.
+      Só vínculos ativos em 31/12.
+    columns:
+      - name: ano
+        tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_tempo'), field: ano}
+      - name: id_municipio
+        tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_municipio'), field: id_municipio}
+      - name: id_cnae_classe
+        tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_cnae'), field: id_cnae_classe}
+      - name: cod_escolaridade
+        tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_escolaridade'), field: cod_escolaridade}
+      - name: qtd_vinculos
+        description: "Quantidade de vínculos ativos em 31/12."
+        tests: [not_null]
+      - name: massa_remuneracao_dezembro
+        description: "Soma da remuneração de dezembro (R$)."
+      - name: remuneracao_media_dezembro
+        description: "Média da remuneração de dezembro (R$)."
+
+  - name: fct_agro_municipio_ano
+    description: "Cruzamento RAIS x PAM/IBGE. 1 linha = ano x município. Agro = CNAE divisões 01 a 03. Produção só até 2024."
+    columns:
+      - name: ano
+        tests: [not_null]
+      - name: id_municipio
+        tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_municipio'), field: id_municipio}
+      - name: vinculos_total
+        description: "Vínculos ativos em 31/12, todos os setores."
+      - name: vinculos_agro
+        description: "Vínculos ativos em 31/12 nas divisões CNAE 01, 02 e 03."
+      - name: valor_producao_mil_reais
+        description: "Valor da produção de lavouras (temporárias + permanentes), em mil reais correntes."
+      - name: area_colhida_ha
+        description: "Área colhida das lavouras, em hectares."

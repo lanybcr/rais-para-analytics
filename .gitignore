@@ -1,0 +1,14 @@
+.venv/
+rais_para/target/
+rais_para/dbt_packages/
+rais_para/logs/
+logs/
+*.pyc
+__pycache__/
+.env
+*.log
+# credenciais (nunca versionar)
+*service-account*.json
+*credentials*.json
+rais_para/.user.yml
+rais_para/dashboard.pbix

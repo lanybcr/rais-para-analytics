@@ -1,0 +1,26 @@
+﻿name: rais_para
+version: "1.0.0"
+config-version: 2
+
+profile: rais_para
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+seed-paths: ["seeds"]
+
+clean-targets: ["target", "dbt_packages"]
+
+# Staging e intermediate viram VIEWS (não ocupam espaço no sandbox e não expiram).
+# Só os marts viram TABELAS (sujeitas aos 60 dias do sandbox: recriar com `dbt run`).
+models:
+  rais_para:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts

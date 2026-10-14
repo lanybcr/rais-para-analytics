@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: basedosdados_rais
+    description: "RAIS (vínculos formais) publicada pela Base dos Dados."
+    database: basedosdados
+    schema: br_me_rais
+    tables:
+      - name: microdados_vinculos
+        description: "Um registro por vínculo de trabalho. Tabela de ~478 GB: sempre filtrar sigla_uf."
+
+  - name: basedosdados_diretorios
+    description: "Tabelas de referência (nomes de municípios e atividades)."
+    database: basedosdados
+    schema: br_bd_diretorios_brasil
+    tables:
+      - name: municipio
+      - name: cnae_2
+
+  - name: basedosdados_pam
+    description: "PAM/IBGE (Produção Agrícola Municipal) publicada pela Base dos Dados. Tabelas pequenas (~0,4 GB)."
+    database: basedosdados
+    schema: br_ibge_pam
+    tables:
+      - name: lavoura_temporaria
+        description: "Soja, milho, mandioca etc. 1 linha = ano x município x produto."
+      - name: lavoura_permanente
+        description: "Açaí, cacau, dendê etc. 1 linha = ano x município x produto."
