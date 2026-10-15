@@ -44,36 +44,16 @@ Base dos Dados (BigQuery público)          dbt (BigQuery)                      
 
 ## Como rodar
 
-Pré-requisitos: Python 3.12, [Google Cloud SDK](https://cloud.google.com/sdk) e uma conta Google com um projeto no BigQuery (o **sandbox gratuito** basta, sem cartão).
+Python 3.12, Google Cloud SDK e um projeto BigQuery (o sandbox gratuito basta). Passo a passo completo em [`docs/como_rodar.md`](docs/como_rodar.md).
 
 ```bash
-python -m venv .venv
-.venv/Scripts/activate            # Windows (Linux/Mac: source .venv/bin/activate)
 pip install -r requirements.txt
-
-gcloud auth application-default login
+cd rais_para && dbt run --profiles-dir . && dbt test --profiles-dir .
 ```
 
-Edite `rais_para/profiles.yml` e troque `project:` pelo ID do seu projeto. O login é via OAuth do gcloud, então não há senha nem chave no repositório.
+## Plano gratuito
 
-```bash
-cd rais_para
-dbt run  --profiles-dir .
-dbt test --profiles-dir .
-dbt docs generate --profiles-dir . && dbt docs serve --profiles-dir .
-```
-
-## Decisões para ficar 100% no plano gratuito
-
-- **BigQuery sandbox:** 10 GB de armazenamento e 1 TB de consultas por mês, sem cobrança.
-- **Trava de custo:** `maximum_bytes_billed` de 10 GB no `profiles.yml`; o dbt recusa qualquer consulta que leia mais que isso.
-- **Filtro sempre por `sigla_uf = 'PA'`** na tabela da RAIS, e `dry run` antes de consultas grandes.
-- **Staging como view, marts como tabela:** views não ocupam espaço nem expiram.
-- **Power BI em modo Import** (não DirectQuery), para não consumir cota do BigQuery a cada clique. O arquivo é aberto no Power BI Desktop; não foi publicado no Power BI Service, que exige licença paga.
-
-## Atenção: tabelas do sandbox expiram em 60 dias
-
-No sandbox, as **tabelas** (os marts) são apagadas automaticamente após 60 dias. As views não expiram. Para recriar tudo, basta rodar `dbt run --profiles-dir .` de novo (leva poucos minutos e fica dentro da cota gratuita).
+Tudo roda sem cobrança: BigQuery sandbox, trava de 10 GB por consulta, filtro por UF e Power BI em modo Import. As **tabelas do sandbox expiram em 60 dias**; para recriar, basta rodar `dbt run` de novo. O GitHub não é afetado.
 
 ## Limitações
 
