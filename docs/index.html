@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case: emprego formal no Pará</title>
+<meta name="description" content="Pipeline de dados da RAIS no Pará com BigQuery, dbt e Power BI: o agro mais que triplicou em valor, o emprego formal não.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F1}
+a{color:#1E6B4C}a:hover{color:#123F2D}
+</style>
+</head>
+<body>
+
+<div style="font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #15211C; background: #F4F5F1; line-height: 1.55">
+
+<!-- HERO -->
+<header style="background: #12221B; color: #F4F5F1; padding: 88px clamp(16px, 5vw, 64px) 96px">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #B9C7BF">
+<span>Case de Analytics Engineering</span><span aria-hidden="true">/</span><span>RAIS · 2015–2025</span>
+</div>
+<h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(40px, 6vw, 76px); line-height: 1.02; letter-spacing: -0.02em; max-width: 960px">O agro do Pará mais que triplicou em valor. O emprego formal, não.</h1>
+<p style="margin: 0; font-size: clamp(17px, 1.6vw, 21px); color: #D5DED9; max-width: 760px">Um pipeline de dados público, do microdado bruto ao dashboard, para responder: <strong style="color: #FFFFFF; font-weight: 600">como evoluiu o emprego formal nos municípios do Pará na última década, por setor e escolaridade, e onde o agro gerou mais vagas formais?</strong></p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="border: 1px solid #3A5247; border-radius: 999px; padding: 6px 14px; font-size: 14px; color: #E4EBE7">BigQuery</span>
+<span style="border: 1px solid #3A5247; border-radius: 999px; padding: 6px 14px; font-size: 14px; color: #E4EBE7">dbt</span>
+<span style="border: 1px solid #3A5247; border-radius: 999px; padding: 6px 14px; font-size: 14px; color: #E4EBE7">SQL</span>
+<span style="border: 1px solid #3A5247; border-radius: 999px; padding: 6px 14px; font-size: 14px; color: #E4EBE7">Modelagem dimensional</span>
+<span style="border: 1px solid #3A5247; border-radius: 999px; padding: 6px 14px; font-size: 14px; color: #E4EBE7">Power BI · DAX</span>
+<span style="border: 1px solid #3A5247; border-radius: 999px; padding: 6px 14px; font-size: 14px; color: #E4EBE7">Base dos Dados</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px">
+<a href="https://github.com/lanybcr/rais-para-analytics" style="display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 22px; background: #F0A36B; color: #12221B; border-radius: 8px; font-weight: 600; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"></path></svg>
+Ver código no GitHub</a>
+<a href="#dashboard" style="display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border: 1px solid #5B7569; color: #F4F5F1; border-radius: 8px; font-weight: 500; text-decoration: none">Ver o dashboard</a>
+</div>
+</div>
+</header>
+
+<!-- KPIs -->
+<section style="padding: 0 clamp(16px, 5vw, 64px)">
+<div style="max-width: 1160px; margin: -48px auto 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: #D9DED8; border: 1px solid #D9DED8; border-radius: 12px; overflow: hidden">
+<div style="background: #FFFFFF; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">1,45 mi</div>
+<div style="font-size: 15px; color: #4A5852">vínculos formais em 2024, <strong style="color: #1E6B4C">+28%</strong> sobre 2015</div>
+</div>
+<div style="background: #FFFFFF; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 40px; line-height: 1; color: #B8571A">3,5×</div>
+<div style="font-size: 15px; color: #4A5852">valor da produção agrícola: de R$ 10,4 bi para R$ 36,0 bi</div>
+</div>
+<div style="background: #FFFFFF; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 40px; line-height: 1; color: #1E6B4C">+18%</div>
+<div style="font-size: 15px; color: #4A5852">vínculos formais do agro: de 53 mil para 63 mil</div>
+</div>
+<div style="background: #FFFFFF; padding: 28px 24px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">144</div>
+<div style="font-size: 15px; color: #4A5852">municípios, 672 classes CNAE e 24 testes de dados</div>
+</div>
+</div>
+</section>
+
+<!-- CAPÍTULO 1 -->
+<section style="padding: 112px clamp(16px, 5vw, 64px) 0">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 56px">
+<div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 16px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; color: #1E6B4C">01 · O MERCADO FORMAL</div>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.01em">Queda em 2016, estagnação até a pandemia, salto a partir de 2021.</h2>
+<p style="margin: 0; color: #4A5852">O estoque de vínculos ativos em 31 de dezembro saiu de 1,13 mi em 2015, caiu para 1,05 mi em 2016 e ficou parado até 2020. Depois disso, ganhou 365 mil vagas em quatro anos.</p>
+<p style="margin: 0; color: #4A5852">Por escolaridade, o ensino médio completo domina, e o superior completo ganha espaço ano a ano. A remuneração média de dezembro de 2024 foi de R$ 3,23 mil (valor nominal).</p>
+</div>
+<figure style="flex: 999 1 560px; min-width: 0; margin: 0; background: #FFFFFF; border: 1px solid #D9DED8; border-radius: 12px; padding: 28px 24px 20px">
+<figcaption style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 14px; color: #4A5852; margin-bottom: 20px"><span style="font-weight: 600; color: #15211C">Vínculos formais ativos em 31/12, Pará (milhões)</span><span>Fonte: RAIS</span></figcaption>
+<div role="img" aria-label="Gráfico de barras: vínculos formais de 1,13 milhão em 2015 a 1,59 milhão em 2025" style="display: flex; align-items: flex-end; gap: 8px; height: 280px; border-bottom: 1px solid #9AA7A0">
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,13</span>
+<div style="width: 100%; max-width: 56px; height: 66.5%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,05</span>
+<div style="width: 100%; max-width: 56px; height: 61.8%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,07</span>
+<div style="width: 100%; max-width: 56px; height: 62.9%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,09</span>
+<div style="width: 100%; max-width: 56px; height: 64.1%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,08</span>
+<div style="width: 100%; max-width: 56px; height: 63.5%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,08</span>
+<div style="width: 100%; max-width: 56px; height: 63.5%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,17</span>
+<div style="width: 100%; max-width: 56px; height: 68.8%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,28</span>
+<div style="width: 100%; max-width: 56px; height: 75.3%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,41</span>
+<div style="width: 100%; max-width: 56px; height: 82.9%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,45</span>
+<div style="width: 100%; max-width: 56px; height: 85.3%; background: #1E6B4C; border-radius: 3px 3px 0 0"></div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">1,59</span>
+<div style="width: 100%; max-width: 56px; height: 93.5%; background: #A9C7B8; border-radius: 3px 3px 0 0"></div>
+</div>
+
+</div>
+<div style="display: flex; gap: 8px; margin-top: 8px">
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2015</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2016</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2017</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2018</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2019</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2020</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2021</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2022</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2023</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2024</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2025</span>
+
+</div>
+<p style="margin: 14px 0 0; font-size: 13px; color: #4A5852">2025 em tom claro: existe na RAIS, mas fica fora do dashboard porque a produção agrícola (PAM/IBGE) vai só até 2024.</p>
+</figure>
+</div>
+</section>
+
+<!-- CAPÍTULO 2 -->
+<section style="padding: 112px clamp(16px, 5vw, 64px) 0">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 16px; max-width: 760px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; color: #1E6B4C">02 · O DESCOMPASSO DO AGRO</div>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.01em">A produção disparou depois de 2020. As vagas formais do agro mal acompanharam.</h2>
+<p style="margin: 0; color: #4A5852">Cruzando a RAIS com a Produção Agrícola Municipal do IBGE, com 2015 como base 100: em 2024 o valor produzido chegou a 346, e os vínculos formais do agro (CNAE 01, 02 e 03), a 118.</p>
+</div>
+<figure style="margin: 0; background: #FFFFFF; border: 1px solid #D9DED8; border-radius: 12px; padding: 28px 24px 20px">
+<figcaption style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 14px; color: #4A5852; margin-bottom: 20px">
+<span style="font-weight: 600; color: #15211C">Índice 2015 = 100</span>
+<span style="display: flex; flex-wrap: wrap; gap: 18px">
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #B8571A"></span>Valor da produção (lavouras)</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="width: 12px; height: 12px; border-radius: 2px; background: #1E6B4C"></span>Vínculos formais do agro</span>
+</span>
+</figcaption>
+<div style="overflow-x: auto">
+<div style="min-width: 620px">
+<div role="img" aria-label="Barras agrupadas por ano: índice do valor da produção chega a 346 em 2024; índice de vínculos do agro chega a 118" style="display: flex; align-items: flex-end; gap: 14px; height: 300px; border-bottom: 1px solid #9AA7A0">
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">100</span>
+<div style="width: 100%; height: 26.3%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">100</span>
+<div style="width: 100%; height: 26.3%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">95</span>
+<div style="width: 100%; height: 25.0%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">96</span>
+<div style="width: 100%; height: 25.3%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">103</span>
+<div style="width: 100%; height: 27.1%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">99</span>
+<div style="width: 100%; height: 26.1%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">97</span>
+<div style="width: 100%; height: 25.5%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">101</span>
+<div style="width: 100%; height: 26.6%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">102</span>
+<div style="width: 100%; height: 26.8%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">95</span>
+<div style="width: 100%; height: 25.0%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">147</span>
+<div style="width: 100%; height: 38.7%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">95</span>
+<div style="width: 100%; height: 25.0%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">199</span>
+<div style="width: 100%; height: 52.4%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">103</span>
+<div style="width: 100%; height: 27.1%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">234</span>
+<div style="width: 100%; height: 61.6%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">121</span>
+<div style="width: 100%; height: 31.8%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">275</span>
+<div style="width: 100%; height: 72.4%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">122</span>
+<div style="width: 100%; height: 32.1%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+<div style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A4012">346</span>
+<div style="width: 100%; height: 91.1%; background: #B8571A; border-radius: 2px 2px 0 0"></div>
+</div>
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1E6B4C">118</span>
+<div style="width: 100%; height: 31.1%; background: #1E6B4C; border-radius: 2px 2px 0 0"></div>
+</div>
+</div>
+
+</div>
+<div style="display: flex; gap: 14px; margin-top: 8px">
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2015</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2016</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2017</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2018</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2019</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2020</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2021</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2022</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2023</span>
+
+<span style="flex: 1 1 0; min-width: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">2024</span>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</section>
+
+<!-- CAPÍTULO 3 -->
+<section style="padding: 112px clamp(16px, 5vw, 64px) 0">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 56px">
+<div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 16px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; color: #1E6B4C">03 · ONDE ESTÃO AS VAGAS</div>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.01em">Produzir muito não é empregar com carteira.</h2>
+<p style="margin: 0; color: #4A5852">Igarapé-Miri, capital do açaí, produziu R$ 13,9 bi em dez anos e tinha só 60 vínculos formais no agro em 2024. Paragominas, com produção parecida, tinha 3.960.</p>
+<p style="margin: 0; color: #4A5852">O agro que gera vaga formal é o de grãos e pecuária. Açaí e cacau são, em boa parte, agricultura familiar e extrativismo, com pouco registro em carteira.</p>
+<div style="margin-top: 12px; background: #E6EDE8; border-radius: 12px; padding: 22px 22px 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-weight: 600">Maiores ganhos de vagas formais no agro, 2015–2024</div>
+
+<div style="display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #C9D5CD; padding-top: 10px; font-size: 15px">
+<span>Santa Isabel do Pará</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #1E6B4C">+2.325</span>
+</div>
+
+<div style="display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #C9D5CD; padding-top: 10px; font-size: 15px">
+<span>Paragominas</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #1E6B4C">+1.004</span>
+</div>
+
+<div style="display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #C9D5CD; padding-top: 10px; font-size: 15px">
+<span>Santana do Araguaia</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #1E6B4C">+714</span>
+</div>
+
+<div style="display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #C9D5CD; padding-top: 10px; font-size: 15px">
+<span>Santa Maria das Barreiras</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #1E6B4C">+696</span>
+</div>
+
+<div style="display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #C9D5CD; padding-top: 10px; font-size: 15px">
+<span>Garrafão do Norte</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #1E6B4C">+616</span>
+</div>
+
+</div>
+</div>
+<figure style="flex: 999 1 560px; min-width: 0; margin: 0; background: #FFFFFF; border: 1px solid #D9DED8; border-radius: 12px; padding: 28px 24px 24px; display: flex; flex-direction: column; gap: 22px">
+<figcaption style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 14px; color: #4A5852"><span style="font-weight: 600; color: #15211C">Produção acumulada 2015–2024 × vínculos formais do agro em 2024</span><span>RAIS e PAM/IBGE</span></figcaption>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<span style="font-weight: 600; font-size: 17px">Igarapé-Miri <span style="font-weight: 400; color: #4A5852; font-size: 14px">· açaí</span></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #8A4012">R$ 13,9 bi produzidos</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: 1 1 auto; height: 14px; background: #EEF1EC; border-radius: 3px; overflow: hidden"><div style="width: 1.5%; height: 100%; background: #1E6B4C"></div></div>
+<span style="flex: 0 0 96px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; color: #1E6B4C">60 vínc.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<span style="font-weight: 600; font-size: 17px">Paragominas <span style="font-weight: 400; color: #4A5852; font-size: 14px">· grãos</span></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #8A4012">R$ 11,1 bi produzidos</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: 1 1 auto; height: 14px; background: #EEF1EC; border-radius: 3px; overflow: hidden"><div style="width: 100.0%; height: 100%; background: #1E6B4C"></div></div>
+<span style="flex: 0 0 96px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; color: #1E6B4C">3.960 vínc.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<span style="font-weight: 600; font-size: 17px">Medicilândia <span style="font-weight: 400; color: #4A5852; font-size: 14px">· cacau</span></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #8A4012">R$ 8,6 bi produzidos</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: 1 1 auto; height: 14px; background: #EEF1EC; border-radius: 3px; overflow: hidden"><div style="width: 2.8%; height: 100%; background: #1E6B4C"></div></div>
+<span style="flex: 0 0 96px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; color: #1E6B4C">111 vínc.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<span style="font-weight: 600; font-size: 17px">Dom Eliseu <span style="font-weight: 400; color: #4A5852; font-size: 14px">· grãos</span></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #8A4012">R$ 6,7 bi produzidos</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: 1 1 auto; height: 14px; background: #EEF1EC; border-radius: 3px; overflow: hidden"><div style="width: 31.9%; height: 100%; background: #1E6B4C"></div></div>
+<span style="flex: 0 0 96px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; color: #1E6B4C">1.263 vínc.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<span style="font-weight: 600; font-size: 17px">Santana do Araguaia <span style="font-weight: 400; color: #4A5852; font-size: 14px">· grãos</span></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #8A4012">R$ 5,8 bi produzidos</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: 1 1 auto; height: 14px; background: #EEF1EC; border-radius: 3px; overflow: hidden"><div style="width: 47.7%; height: 100%; background: #1E6B4C"></div></div>
+<span style="flex: 0 0 96px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; color: #1E6B4C">1.889 vínc.</span>
+</div>
+</div>
+
+</figure>
+</div>
+</section>
+
+<!-- ENGENHARIA -->
+<section style="margin-top: 128px; background: #FFFFFF; border-top: 1px solid #D9DED8; border-bottom: 1px solid #D9DED8; padding: 96px clamp(16px, 5vw, 64px)">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 16px; max-width: 760px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; color: #1E6B4C">COMO FOI CONSTRUÍDO</div>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.01em">De 478 GB de microdados a um modelo estrela testado.</h2>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px">
+<div style="flex: 1 1 200px; border: 1px solid #D9DED8; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #F4F5F1">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">FONTES</div>
+<div style="font-weight: 600">Base dos Dados</div>
+<div style="font-size: 14px; color: #4A5852">RAIS vínculos (478 GB), diretórios de municípios e CNAE, PAM/IBGE lavouras</div>
+</div>
+<div aria-hidden="true" style="flex: 0 0 auto; display: flex; align-items: center; color: #9AA7A0; font-size: 22px">→</div>
+<div style="flex: 1 1 200px; border: 1px solid #D9DED8; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #F4F5F1">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">STAGING · VIEWS</div>
+<div style="font-weight: 600">4 modelos dbt</div>
+<div style="font-size: 14px; color: #4A5852">Filtro por UF = PA, tipagem, limpeza e padronização de nomes</div>
+</div>
+<div aria-hidden="true" style="flex: 0 0 auto; display: flex; align-items: center; color: #9AA7A0; font-size: 22px">→</div>
+<div style="flex: 1 1 200px; border: 1px solid #1E6B4C; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #E6EDE8">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #1E6B4C">MARTS · TABELAS</div>
+<div style="font-weight: 600">Modelo estrela</div>
+<div style="font-size: 14px; color: #4A5852">2 fatos e 4 dimensões, com 24 testes de dados</div>
+</div>
+<div aria-hidden="true" style="flex: 0 0 auto; display: flex; align-items: center; color: #9AA7A0; font-size: 22px">→</div>
+<div style="flex: 1 1 200px; border: 1px solid #D9DED8; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #F4F5F1">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5852">CONSUMO</div>
+<div style="font-weight: 600">Power BI</div>
+<div style="font-size: 14px; color: #4A5852">Modo Import, medidas DAX de estoque, 3 páginas</div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 48px">
+<div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<div style="font-weight: 600; font-size: 18px">Modelo estrela</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; font-size: 14px">
+<div style="border: 1px solid #D9DED8; border-radius: 8px; padding: 12px; text-align: center"><div style="font-family: 'IBM Plex Mono', monospace; font-weight: 500">dim_tempo</div><div style="color: #4A5852">2015–2025</div></div>
+<div style="border: 1px solid #D9DED8; border-radius: 8px; padding: 12px; text-align: center"><div style="font-family: 'IBM Plex Mono', monospace; font-weight: 500">dim_municipio</div><div style="color: #4A5852">144</div></div>
+<div style="border: 1px solid #D9DED8; border-radius: 8px; padding: 12px; text-align: center"><div style="font-family: 'IBM Plex Mono', monospace; font-weight: 500">dim_cnae</div><div style="color: #4A5852">672</div></div>
+<div style="grid-column: span 2; border: 2px solid #1E6B4C; background: #E6EDE8; border-radius: 8px; padding: 12px; text-align: center"><div style="font-family: 'IBM Plex Mono', monospace; font-weight: 500">fct_vinculos</div><div style="color: #4A5852">ano × município × CNAE × escolaridade · ~420 mil linhas</div></div>
+<div style="border: 1px solid #D9DED8; border-radius: 8px; padding: 12px; text-align: center"><div style="font-family: 'IBM Plex Mono', monospace; font-weight: 500">dim_escolaridade</div><div style="color: #4A5852">12</div></div>
+<div style="grid-column: span 3; border: 2px solid #B8571A; background: #FBEDE3; border-radius: 8px; padding: 12px; text-align: center"><div style="font-family: 'IBM Plex Mono', monospace; font-weight: 500">fct_agro_municipio_ano</div><div style="color: #4A5852">ano × município · vínculos do agro + valor e área da produção</div></div>
+</div>
+</div>
+<div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<div style="font-weight: 600; font-size: 18px">Decisões que importam</div>
+<div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px">
+<div style="display: flex; gap: 12px"><span style="flex: 0 0 auto; font-family: 'IBM Plex Mono', monospace; color: #1E6B4C">01</span><span><strong>Custo zero.</strong> BigQuery sandbox, trava de 10 GB por consulta, filtro por UF e dry run antes de tocar a tabela de 478 GB.</span></div>
+<div style="display: flex; gap: 12px"><span style="flex: 0 0 auto; font-family: 'IBM Plex Mono', monospace; color: #1E6B4C">02</span><span><strong>Estoque não se soma.</strong> Vínculos são uma foto de 31/12; as medidas DAX usam sempre o último ano do filtro.</span></div>
+<div style="display: flex; gap: 12px"><span style="flex: 0 0 auto; font-family: 'IBM Plex Mono', monospace; color: #1E6B4C">03</span><span><strong>Testes onde são baratos.</strong> not_null, unique, relationships e granularidade única nos marts; o staging fica sem testes para não reler a fonte.</span></div>
+<div style="display: flex; gap: 12px"><span style="flex: 0 0 auto; font-family: 'IBM Plex Mono', monospace; color: #1E6B4C">04</span><span><strong>Import, não DirectQuery.</strong> O dashboard não consome cota do BigQuery a cada clique.</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" style="padding: 112px clamp(16px, 5vw, 64px) 0">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 16px; max-width: 760px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; color: #1E6B4C">O DASHBOARD</div>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.01em">Três páginas no Power BI.</h2>
+</div>
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
+<img src="img/pagina1.png" alt="Página Visão geral do dashboard: cartões de vínculos, remuneração e variação, linha do tempo e treemap por setor" style="width: 100%; height: auto; display: block; border: 1px solid #D9DED8; border-radius: 12px; background: #FFFFFF">
+<figcaption style="font-size: 14px; color: #4A5852"><strong style="color: #15211C">Visão geral.</strong> Vínculos, remuneração média, variação anual e distribuição por setor.</figcaption>
+</figure>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px">
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
+<img src="img/pagina2.png" alt="Página Setor e escolaridade: barras 100% por escolaridade e remuneração média por seção CNAE" style="width: 100%; height: auto; display: block; border: 1px solid #D9DED8; border-radius: 12px; background: #FFFFFF">
+<figcaption style="font-size: 14px; color: #4A5852"><strong style="color: #15211C">Setor e escolaridade.</strong> Composição por escolaridade e salário por setor.</figcaption>
+</figure>
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
+<img src="img/pagina3.png" alt="Página Agro no Pará: top 10 municípios, produção versus vínculos e dispersão" style="width: 100%; height: auto; display: block; border: 1px solid #D9DED8; border-radius: 12px; background: #FFFFFF">
+<figcaption style="font-size: 14px; color: #4A5852"><strong style="color: #15211C">Agro no Pará.</strong> Top 10 municípios, produção × vínculos e dispersão.</figcaption>
+</figure>
+</div>
+</div>
+</section>
+
+<!-- LIMITAÇÕES + RODAPÉ -->
+<section style="padding: 112px clamp(16px, 5vw, 64px) 96px">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 48px">
+<div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-weight: 600; font-size: 18px">Limitações</div>
+<ul style="margin: 0; padding-left: 20px; color: #4A5852; display: flex; flex-direction: column; gap: 8px">
+<li>Salários em reais nominais, sem correção pela inflação.</li>
+<li>A PAM cobre só lavouras (temporárias e permanentes) e vai até 2024; pecuária e extrativismo ficam de fora.</li>
+<li>A RAIS mede só o emprego formal; a informalidade, grande no agro paraense, não aparece.</li>
+</ul>
+</div>
+<div style="flex: 1 1 320px; background: #12221B; color: #F4F5F1; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2">Código, modelos dbt e medidas DAX estão abertos.</div>
+<a href="https://github.com/lanybcr/rais-para-analytics" style="display: inline-flex; align-self: flex-start; align-items: center; min-height: 48px; padding: 0 22px; background: #F0A36B; color: #12221B; border-radius: 8px; font-weight: 600; text-decoration: none">github.com/lanybcr/rais-para-analytics</a>
+<div style="font-size: 13px; color: #B9C7BF">Fontes: RAIS (MTE) e PAM (IBGE), via Base dos Dados.</div>
+</div>
+</div>
+</section>
+
+</div>
+</body>
+</html>

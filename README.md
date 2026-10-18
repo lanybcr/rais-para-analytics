@@ -2,6 +2,8 @@
 
 Projeto de Analytics Engineering: do dado bruto público até um dashboard, com modelagem dimensional, testes e documentação.
 
+**[Ver o case completo](https://lanybcr.github.io/rais-para-analytics/)**, a história do projeto em uma página.
+
 > **Pergunta guia:** como evoluiu o emprego formal nos municípios do Pará na última década, por setor (CNAE) e escolaridade, e onde o agro gerou mais vagas formais?
 
 ## Dashboard
